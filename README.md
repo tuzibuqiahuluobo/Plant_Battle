@@ -98,11 +98,6 @@ Plant_Battle/
 - [ ] 粒子系统和角色特效动画实现
 - [ ] 胜负检定和结算动效实现
 
-
-贡献 🙌
-
-欢迎任何形式的贡献！如果你有好的想法或发现了问题，欢迎提交 Issue 或 Pull Request。
-
 👨‍💻 开发者: nuomimuyouci
 
 📫 联系信息: https://github.com/tuzibuqiahuluobo \ 2672172829@qq.com
