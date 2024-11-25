@@ -104,6 +104,6 @@ Plant_Battle/
 欢迎任何形式的贡献！如果你有好的想法或发现了问题，欢迎提交 Issue 或 Pull Request。
 
 
-开发者 👨‍💻
-开发者: nuomimuyouci
-联系信息: https://github.com/tuzibuqiahuluobo
+
+👨‍💻 开发者: nuomimuyouci
+📫 联系信息: https://github.com/tuzibuqiahuluobo \ 2672172829@qq.com
