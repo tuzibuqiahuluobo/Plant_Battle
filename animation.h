@@ -2,7 +2,7 @@
 
 #include "atlas.h"
 #include "Util.h"
-
+#include "camera.h"
 #include <functional>
 #include <graphics.h>
 
@@ -86,10 +86,10 @@ public:
 		}
 	}
 
-	void on_draw(int x, int y) const //绘制当前帧
+	void on_draw(const Camera& camera , int x, int y) const //绘制当前帧
 	{
 		//调用工具函数绘制带有透明效果的图像
-		putimage_alpha(x, y, atlas->get_image(idx_frame));
+		putimage_alpha(camera,x, y, atlas->get_image(idx_frame));
 	}
 
 	void set_callback(std::function<void()> callback)//设置动画播放完毕后的回调函数

@@ -2,6 +2,7 @@
 #include "Util.h"
 #include "scene.h"
 #include "atlas.h"
+#include "platform.h"
 #include "menu_scene.h"
 #include "game_scene.h"
 #include "selector_scene.h"
@@ -10,6 +11,8 @@
 #include <graphics.h>
 
 #pragma comment(lib, "Winmm.lib")
+
+bool is_debug = false; // 是否为调试模式
 
 //所需 图片/图集 变量的定义:
 //1.主菜单背景 图片
@@ -101,8 +104,13 @@ Scene* menu_scene = nullptr;
 Scene* game_scene = nullptr;
 Scene* selector_scene = nullptr;
 
+//定义摄像机对象
+Camera main_camera;
 //实例化场景管理器
 SceneManager scene_manager;
+
+//vector类型的平台列表
+std::vector<Platform> platform_list;
 
 void filp_atlas(Atlas& src, Atlas& dst)
 {
@@ -115,9 +123,7 @@ void filp_atlas(Atlas& src, Atlas& dst)
 	}
 }
 
-void load_from_file(){
 
-}
 
 //加载游戏资源
 void load_game_resource()
@@ -127,6 +133,7 @@ void load_game_resource()
 	AddFontResourceEx(_T("resources/IPix.ttf"), FR_PRIVATE, nullptr);
 
 	//加载图片
+	loadimage(&img_menu_background, _T("resources/menu_background.png"));
 	loadimage(&img_VS, _T("resources/VS.png"));
 	loadimage(&img_1P, _T("resources/1P.png"));
 	loadimage(&img_2P, _T("resources/2P.png"));
@@ -229,6 +236,9 @@ int main()
 
 	initgraph(1280, 720,EW_SHOWCONSOLE);
 
+	settextstyle(28, 0, _T("IPix"));
+	setbkmode(TRANSPARENT);
+
 	BeginBatchDraw();
 	//初始化阶段将他们指向对应的子场景类型实例
 	menu_scene = new MenuScene();
@@ -261,7 +271,7 @@ int main()
 
 		cleardevice();
 
-		scene_manager.on_draw();
+		scene_manager.on_draw(main_camera);
 
 		FlushBatchDraw();
 
