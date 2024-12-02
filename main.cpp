@@ -2,8 +2,9 @@
 #include "Util.h"
 #include "scene.h"
 #include "atlas.h"
-#include "platform.h"
+#include "bullet.h"
 #include "player.h"
+#include "platform.h"
 #include "menu_scene.h"
 #include "game_scene.h"
 #include "selector_scene.h"
@@ -63,8 +64,8 @@ Atlas atlas_peashooter_idle_left; // 婉逗射手朝向左的默认动画图集
 Atlas atlas_peashooter_idle_right; // 婉逗射手朝向右的默认动画图集
 Atlas atlas_peashooter_run_left; // 婉逗射手朝向左的跑步动画图集
 Atlas atlas_peashooter_run_right; // 婉逗射手朝向右的跑步动画图集
-Atlas atlas_peashooter_attack_ex_left; // 婉逗射手朝向左的攻击动画图集
-Atlas atlas_peashooter_attack_ex_right; // 婉逗射手朝向右的攻击动画图集
+Atlas atlas_peashooter_attack_ex_left; // 婉逗射手朝向左的特殊攻击动画图集
+Atlas atlas_peashooter_attack_ex_right; // 婉逗射手朝向右的特殊攻击动画图集
 Atlas atlas_peashooter_die_left; // 婉逗射手朝向左的死亡动画图集
 Atlas atlas_peashooter_die_right; // 婉逗射手朝向右的死亡动画图集
 
@@ -72,8 +73,8 @@ Atlas atlas_sunflower_idle_left; // 龙日葵朝向左的默认动画图集
 Atlas atlas_sunflower_idle_right; // 龙日葵朝向右的默认动画图集
 Atlas atlas_sunflower_run_left; // 龙日葵朝向左的跑步动画图集
 Atlas atlas_sunflower_run_right; // 龙日葵朝向右的跑步动画图集
-Atlas atlas_sunflower_attack_ex_left; // 龙日葵朝向左的攻击动画图集
-Atlas atlas_sunflower_attack_ex_right; // 龙日葵朝向右的攻击动画图集
+Atlas atlas_sunflower_attack_ex_left; // 龙日葵朝向左的特殊攻击动画图集
+Atlas atlas_sunflower_attack_ex_right; // 龙日葵朝向右的特殊攻击动画图集
 Atlas atlas_sunflower_die_left; // 龙日葵朝向左的死亡动画图集
 Atlas atlas_sunflower_die_right; // 龙日葵朝向右的死亡动画图集
 
@@ -109,6 +110,8 @@ Camera main_camera;
 //实例化场景管理器
 SceneManager scene_manager;
 
+//定义bullet指针数组
+std::vector<Bullet*> bullet_list;
 //vector类型的平台列表
 std::vector<Platform> platform_list;
 

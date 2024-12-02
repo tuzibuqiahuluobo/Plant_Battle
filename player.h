@@ -15,6 +15,11 @@ public:
 	Player()
 	{
 		current_animation = &animation_idle_right;
+
+		//初始化普通攻击冷却定时器
+		timer_attack_cd.set_wait_time(attack_cd);
+		timer_attack_cd.set_one_shot(true);
+		timer_attack_cd.set_callback([&]() { can_attack = true; });
 	}
 	~Player() = default;
 
@@ -39,6 +44,8 @@ public:
 		}
 		//更新动画
 		current_animation->on_update(delta);
+
+		timer_attack_cd.on_update(delta);
 
 		move_and_collide(delta);
 	}
@@ -71,6 +78,23 @@ public:
 				case 0x57:
 					on_jump();
 					break;
+					// 'F'
+				case 0x46:
+					if (can_attack)
+					{
+						on_attack();
+						can_attack = false;
+						timer_attack_cd.restart();
+					}
+					break;
+					// 'G'
+				case 0x47:
+					if (mp >= 100)
+					{
+						on_attack_ex();
+						mp = 0;
+					}
+					break;
 				}
 				break;
 			case PlayerID::P2:
@@ -88,10 +112,24 @@ public:
 				case VK_UP:
 					on_jump();
 					break;
+					// '.'
+				case VK_OEM_PERIOD:
+					if (can_attack)
+					{
+						on_attack();
+						can_attack = false;
+						timer_attack_cd.restart();
+					}
+					break;
+					// '/'
+				case VK_OEM_2:
+					if (mp >= 100)
+					{
+						on_attack_ex();
+						mp = 0;
+					}
+					break;
 				}
-
-			default:
-				break;
 			}
 			break;
 		case WM_KEYUP:
@@ -145,19 +183,47 @@ public:
 
 	virtual void on_run(float distance)
 	{
+		if (is_attacking_ex)
+		{
+			return;
+		}
+
 		position.x += distance;
 	}
 
 	virtual void on_jump()
 	{
-		//如果玩家正在下落，那么就不允许再次跳跃
-		if (velocity.y != 0)
+		//如果玩家正在下落或者正在进行特殊攻击，那么就不允许再次跳跃
+		if (velocity.y != 0 || is_attacking_ex)
 		{
 			return;
 		}
 		//设置玩家的垂直速度为跳跃速度
 		velocity.y += jump_velocity;
 	}
+	
+	//攻击逻辑
+	virtual void on_attack()
+	{
+		
+	}
+
+	//特殊攻击逻辑
+	virtual void on_attack_ex()
+	{
+		
+	}
+
+	const Vector2& get_position() const
+	{
+		return position;
+	}
+
+	const Vector2& get_size() const
+	{
+		return size;
+	}
+
 
 
 protected:
@@ -229,6 +295,9 @@ protected:
 
 
 protected:
+	int mp = 0;		    //玩家能量值
+	int hp = 100;		//玩家的生命值
+
 	Vector2 size;		//玩家的尺寸
 	Vector2 position;	//记录玩家的位置
 	Vector2 velocity;	//记录玩家的速度
@@ -237,6 +306,9 @@ protected:
 	Animation animation_idle_right;			//玩家朝向右的默认动画
 	Animation animation_run_left;	  		//玩家朝向左的跑步动画
 	Animation animation_run_right;			//玩家朝向右的跑步动画
+	Animation animation_attack_ex_left;		//玩家朝向左的特殊攻击动画
+	Animation animation_attack_ex_right;	//玩家朝向右的特殊攻击动画
+
 
 	Animation* current_animation = nullptr; //当前正在播放的动画
 
@@ -246,5 +318,11 @@ protected:
 	bool is_right_key_down = false;			//右键是否按下
 
 	bool is_fating_right = true;			//玩家是否朝向右边
+
+	int attack_cd = 500;					//普通攻击冷却时间
+	bool can_attack = true;					//玩家是否可以释放普通攻击
+	Timer timer_attack_cd;					//普通攻击冷却定时器
+
+	bool is_attacking_ex = false;			//玩家是否正在释放特殊攻击
 };
 

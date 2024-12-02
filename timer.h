@@ -8,7 +8,7 @@ public:
 	~Timer() = default;
 
 	//重置定时器的状态
-	void resart()
+	void restart()
 	{
 		pass_time = 0;
 		shotted = false;

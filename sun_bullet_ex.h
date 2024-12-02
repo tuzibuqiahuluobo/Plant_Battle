@@ -99,8 +99,6 @@ public:
 	}
 
 
-
-
 private:
 	Animation animation_ex_idle;		// 特殊太阳子弹默认动画
 	Animation animation_ex_explode;		// 特殊太阳子弹爆炸动画
