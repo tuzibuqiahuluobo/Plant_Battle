@@ -59,7 +59,7 @@ Plant_Battle/
 
 │ │ ├── selector_scene.h # 选人场景头文件
 
-│ ├── Player/ #角色筛选器
+│ ├── player/ #角色筛选器
 
 │ │ ├── player.h # 角色基类头文件
 
