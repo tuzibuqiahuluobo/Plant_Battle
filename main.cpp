@@ -119,6 +119,13 @@ std::vector<Platform> platform_list;
 Player* player_1 = nullptr;
 Player* player_2 = nullptr;
 
+//定义全局头像图片指针
+IMAGE* img_player_1_avatar = nullptr;
+IMAGE* img_player_2_avatar = nullptr;
+
+//定义一个全局自定义判断变量
+bool is_explore = true;
+
 
 void filp_atlas(Atlas& src, Atlas& dst)
 {

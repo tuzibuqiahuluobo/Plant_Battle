@@ -5,6 +5,7 @@
 #include "platform.h"
 #include "player.h"
 #include "scene_manager.h"
+#include "status_bar.h"
 
 extern Player* player_1;
 extern Player* player_2;
@@ -17,6 +18,9 @@ extern IMAGE img_platform_small; // 小型平台图片
 extern Camera main_camera;
 extern std::vector<Platform> platform_list;
 
+extern IMAGE* img_player_1_avatar; // 玩家1头像图片
+extern IMAGE* img_player_2_avatar; // 玩家2头像图片
+
 extern SceneManager scene_manager;
 
 class GameScene : public Scene
@@ -28,6 +32,13 @@ public:
 private:
 	void on_enter()
 	{
+		//初始化玩家头像和位置
+		status_bar_1P.set_avatar(img_player_1_avatar);
+		status_bar_2P.set_avatar(img_player_2_avatar);
+
+		status_bar_1P.set_position(235, 625);
+		status_bar_2P.set_position(675, 625); 
+
 		//初始化玩家1和玩家2的位置
 		player_1->set_position(200, 50);
 		player_2->set_position(975, 50);
@@ -106,6 +117,12 @@ private:
 		{
 			bullet->on_update(delta);
 		}
+
+		status_bar_1P.set_hp(player_1->get_hp());
+		status_bar_1P.set_mp(player_1->get_mp());
+		status_bar_2P.set_hp(player_2->get_hp());
+		status_bar_2P.set_mp(player_2->get_mp());
+
 	}
 	void on_draw(const Camera& camera)
 	{
@@ -130,6 +147,9 @@ private:
 		{
 			bullet->on_draw(camera);
 		}
+
+		status_bar_1P.on_draw();
+		status_bar_2P.on_draw();
 	}
 	void on_input(const ExMessage& msg)
 	{
@@ -159,5 +179,8 @@ private:
 private:
 	POINT pos_img_sky = { 0 };			// 天空图片位置
 	POINT pos_img_hills = { 0 };		// 山脉图片位置
+
+	StatusBar status_bar_1P;			// 玩家1的状态栏
+	StatusBar status_bar_2P;			// 玩家2的状态栏
 
 };

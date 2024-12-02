@@ -81,6 +81,8 @@ public:
 		{
 			animation_sun_text.on_update(delta);
 		}
+
+		
 	}
 
 	void on_draw(const Camera& camera)
@@ -131,9 +133,23 @@ public:
 	{
 		is_attacking_ex = true;
 		is_sun_text_visible = true;
-
+		
 		animation_sun_text.reset();
+
+		is_sun_text_visible = is_explore;
+
+		if (is_sun_text_visible)
+		{
+			std::cout << "true" << std::endl;
+		}
+		else
+		{
+			std::cout << "false" << std::endl;
+		}
+		
+
 		is_fating_right ? animation_attack_ex_right.reset() : animation_attack_ex_left.reset();
+		
 
 		Bullet* bullet = new SunBulletEx();
 		//根据id判断目标对象是哪一个玩家
@@ -151,18 +167,21 @@ public:
 		bullet->set_position(bullet_position.x, bullet_position.y);
 		bullet->set_velocity(bullet_velocity.x, bullet_velocity.y);
 
-		bullet->set_collide_target(id == PlayerID::P1 ? PlayerID::P2 : PlayerID::P1);
-
+		
 		//设置子弹的碰撞回调函数，当子弹碰撞时，增加玩家的mp值。
 		bullet->set_callback([&]()
 			{
 				mp += 50;
 			});
 
+		
+
 		bullet_list.push_back(bullet);
 
 		//播放特殊攻击音效
 		mciSendString(_T("play sunText from 0"), NULL, 0, NULL);
+
+		
 	}
 
 

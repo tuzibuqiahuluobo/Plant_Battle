@@ -48,6 +48,9 @@ extern Atlas atlas_sunflower_idle_right; // 龙日葵朝向右的默认动画图
 extern IMAGE img_avatar_peashooter; // 婉逗射手头像图片
 extern IMAGE img_avatar_sunflower; // 龙日葵头像图片
 
+extern IMAGE* img_player_1_avatar; // 玩家1头像图片
+extern IMAGE* img_player_2_avatar; // 玩家2头像图片
+
 extern SceneManager scene_manager;
 
 class SelectorScene : public Scene
@@ -294,9 +297,11 @@ public:
 		{
 		case PlayerType::Peashooter:
 			player_1 = new PeashooterPlayer();
+			img_player_1_avatar = &img_avatar_peashooter;
 			break;
 		case PlayerType::Sunflower:
 			player_1 = new SunflowerPlayer();
+			img_player_1_avatar = &img_avatar_sunflower;
 			break;
 		}
 		player_1->set_id(PlayerID::P1);
@@ -305,9 +310,11 @@ public:
 		{
 		case PlayerType::Peashooter:
 			player_2 = new PeashooterPlayer();
+			img_player_2_avatar = &img_avatar_peashooter;
 			break;
 		case PlayerType::Sunflower:
 			player_2 = new SunflowerPlayer();
+			img_player_2_avatar = &img_avatar_sunflower;
 			break;
 		}
 		player_2->set_id(PlayerID::P2);

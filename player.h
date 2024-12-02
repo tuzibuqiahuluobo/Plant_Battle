@@ -51,7 +51,10 @@ public:
 
 		if (direction != 0)
 		{
-			is_fating_right = direction > 0;
+			if (!is_attacking_ex)
+			{
+				is_fating_right = direction > 0;
+			}
 			//根据玩家的移动方向来切换动画
 			current_animation = is_fating_right ? &animation_run_right : &animation_run_left;
 			//在这一帧中玩家在水平方向上移动的距离存储在distance中
@@ -63,6 +66,13 @@ public:
 			//如果玩家没有移动，那么就播放默认动画
 			current_animation = is_fating_right ? &animation_idle_right : &animation_idle_left;
 		}
+
+		if (is_attacking_ex)
+		{
+			current_animation = is_fating_right ? &animation_attack_ex_right : &animation_attack_ex_left;
+
+		}
+
 		//更新动画
 		current_animation->on_update(delta);
 
@@ -79,6 +89,14 @@ public:
 		}
 
 		move_and_collide(delta);
+
+		// 检查大招是否结束，如果结束，重置 is_attacking_ex 状态
+		if (current_animation->check_finished() && is_attacking_ex)
+		{
+			is_attacking_ex = false;
+			// 重置动画为默认动画
+			current_animation = is_fating_right ? &animation_idle_right : &animation_idle_left;
+		}
 	}
 
 	virtual void on_draw(const Camera& camera)
@@ -256,7 +274,13 @@ public:
 	//特殊攻击逻辑
 	virtual void on_attack_ex()
 	{
-		
+		if (!is_attacking_ex)
+		{
+			is_attacking_ex = true;
+			// 设置大招动画
+			current_animation = is_fating_right ? &animation_attack_ex_right : &animation_attack_ex_left;
+			current_animation->reset();
+		}
 	}
 
 	const Vector2& get_position() const
@@ -273,6 +297,16 @@ public:
 	{
 		is_invulnerable = true;
 		timer_invulnerable.restart();
+	}
+
+	int get_hp() const
+	{
+		return hp;
+	}
+
+	int get_mp() const
+	{
+		return mp;
 	}
 
 
