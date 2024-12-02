@@ -7,6 +7,8 @@
 #include "animation.h"	
 #include <graphics.h>
 
+extern bool is_debug; // 是否为调试模式
+
 extern std::vector<Platform> platform_list;
 extern std::vector<Bullet*> bullet_list;
 
@@ -89,6 +91,12 @@ public:
 		{
 			//对当前正在播放的动画进行绘制
 			current_animation->on_draw(camera, (int)position.x, (int)position.y);
+		}
+
+		if (is_debug)
+		{
+			setlinecolor(RGB(0, 125, 255));
+			rectangle((int)position.x, (int)position.y, (int)(position.x + size.x), (int)(position.y + size.y));
 		}
 		
 	}

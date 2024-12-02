@@ -7,6 +7,8 @@
 #include <graphics.h>
 #include <functional>
 
+extern bool is_debug; // 是否为调试模式
+
 class Bullet
 {
 public:
@@ -121,7 +123,14 @@ public:
 	//子弹的绘制逻辑
 	virtual void on_draw(const Camera& camera) const
 	{
-		
+		if (is_debug)
+		{
+			setfillcolor(RGB(255, 255, 255));
+			setlinecolor(RGB(255, 255, 255));
+			rectangle((int)position.x, (int)position.y, 
+				(int)(position.x + size.x), (int)(position.y + size.y));
+			solidcircle((int)(position.x + size.x / 2), (int)(position.y + size.y / 2), 5);
+		}
 	}
 
 protected:
