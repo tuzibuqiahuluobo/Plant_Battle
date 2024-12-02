@@ -20,7 +20,25 @@ public:
 		//初始化普通攻击冷却定时器
 		timer_attack_cd.set_wait_time(attack_cd);
 		timer_attack_cd.set_one_shot(true);
-		timer_attack_cd.set_callback([&]() { can_attack = true; });
+		timer_attack_cd.set_callback([&]() 
+			{ 
+				can_attack = true;
+			});
+
+		//初始化无敌时间定时器
+		timer_invulnerable.set_wait_time(750);
+		timer_invulnerable.set_one_shot(true);
+		timer_invulnerable.set_callback([&]() 
+			{ 
+				is_invulnerable = false;
+			});
+
+		//初始化无敌动画闪烁定时器
+		timer_invulnerable_blink.set_wait_time(75);
+		timer_invulnerable_blink.set_callback([&]()
+			{
+				is_showing_sketch_frame = !is_showing_sketch_frame;
+			});
 	}
 	~Player() = default;
 
@@ -48,13 +66,31 @@ public:
 
 		timer_attack_cd.on_update(delta);
 
+		//更新无敌时间定时器
+		timer_invulnerable.on_update(delta);
+		//更新无敌动画闪烁定时器
+		timer_invulnerable_blink.on_update(delta);
+
+		if (is_showing_sketch_frame)
+		{
+			sketch_image(current_animation->get_frame(), &img_sketch);
+		}
+
 		move_and_collide(delta);
 	}
 
 	virtual void on_draw(const Camera& camera)
 	{
-		//对当前正在播放的动画进行绘制
-		current_animation->on_draw(camera, (int)position.x, (int)position.y);
+		if (hp > 0 && is_invulnerable && is_showing_sketch_frame)
+		{
+			putimage_alpha(camera, (int)position.x, (int)position.y, &img_sketch);
+		}
+		else
+		{
+			//对当前正在播放的动画进行绘制
+			current_animation->on_draw(camera, (int)position.x, (int)position.y);
+		}
+		
 	}
 
 	virtual void on_input(const ExMessage& msg)
@@ -225,6 +261,12 @@ public:
 		return size;
 	}
 
+	void make_invulnerable()
+	{
+		is_invulnerable = true;
+		timer_invulnerable.restart();
+	}
+
 
 
 protected:
@@ -287,21 +329,26 @@ protected:
 			}
 		}
 
-		for (Bullet* bullet :bullet_list)
+		if (!is_invulnerable)
 		{
-			if (!bullet->get_valid() || bullet->get_collide_target() != id)
+			for (Bullet* bullet : bullet_list)
 			{
-				continue;
-			}
+				if (!bullet->get_valid() || bullet->get_collide_target() != id)
+				{
+					continue;
+				}
 
-			if (bullet->check_collision(position,size))
-			{
-				bullet->on_collide();
-				bullet->set_valid(false);
-				hp -= bullet->get_damage();
-			}
+				if (bullet->check_collision(position, size))
+				{
+					make_invulnerable();
+					bullet->on_collide();
+					bullet->set_valid(false);
+					hp -= bullet->get_damage();
+				}
 
+			}
 		}
+		
 	}
 
 
@@ -341,5 +388,13 @@ protected:
 	Timer timer_attack_cd;					//普通攻击冷却定时器
 
 	bool is_attacking_ex = false;			//玩家是否正在释放特殊攻击
+
+	bool is_invulnerable = false;			//玩家是否无敌
+	bool is_showing_sketch_frame = false;	//当前帧是否应该显示剪影
+
+	Timer timer_invulnerable;				//无敌状态定时器
+	Timer timer_invulnerable_blink;			//无敌状态闪烁定时器
+
+	IMAGE img_sketch;						//剪影图像
 };
 

@@ -58,3 +58,20 @@ inline void putimage_alpha(int dst_x, int dst_y, int width, int height, IMAGE* i
 	AlphaBlend(GetImageHDC(GetWorkingImage()), dst_x, dst_y,w, h,
 		GetImageHDC(img), src_x, src_y, w, h,{ AC_SRC_OVER,0,255, AC_SRC_ALPHA });
 }
+
+inline void sketch_image(IMAGE* src,IMAGE* dst)
+{
+	int w = src->getwidth();
+	int h = src->getheight();
+	Resize(dst, w, h);
+	DWORD* src_buffer = GetImageBuffer(src);
+	DWORD* dst_buffer = GetImageBuffer(dst);
+	for (int y = 0; y < h; y++)
+	{
+		for (int x = 0; x < w; x++)
+		{
+			int idx = y * w + x;
+			dst_buffer[idx] = BGR(RGB(255, 255, 255)) | (src_buffer[idx] & 0xFF000000);
+		}
+	}
+}
