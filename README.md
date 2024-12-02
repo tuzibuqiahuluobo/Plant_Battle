@@ -41,6 +41,8 @@ Plant_Battle/
 
 │ ├── animation.h # 动画头文件
 
+│ ├── status_bar.h #头像及状态栏头文件
+
 │ ├── atlas.h # 图集类头文件
 
 │ ├── camera.h # 摄像机头文件
