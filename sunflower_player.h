@@ -27,6 +27,9 @@ public:
 		animation_run_left.set_interval(75);
 		animation_run_right.set_interval(75);
 
+		//ÉèÖÃÍæ¼ÒµÄ³ß´ç
+		size.x = 96, size.y = 96;
+
 	}
 	~SunflowerPlayer() = default;
 
