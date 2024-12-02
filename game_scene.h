@@ -15,6 +15,10 @@ extern IMAGE img_hills; // 山脉图片
 extern IMAGE img_platform_large; // 大型平台图片
 extern IMAGE img_platform_small; // 小型平台图片
 
+extern IMAGE img_1P_winner; // 1P 获胜文本图片
+extern IMAGE img_2P_winner; // 2P 获胜文本图片
+extern IMAGE img_winner_bar; // 获胜玩家背景文本图片
+
 extern Camera main_camera;
 extern std::vector<Platform> platform_list;
 
@@ -32,6 +36,34 @@ public:
 private:
 	void on_enter()
 	{
+		is_game_over = false;
+		is_slide_out_started = false;
+
+		pos_img_winner_bar.x = -img_winner_bar.getwidth();
+		pos_img_winner_bar.y = (getheight() - img_winner_bar.getheight()) / 2;
+		pos_x_img_winner_bar_dst = (getwidth() - img_winner_bar.getwidth()) / 2;
+
+		pos_img_winner_text.x = pos_img_winner_bar.x;
+		pos_img_winner_text.y = (getheight() - img_1P_winner.getheight()) / 2;
+		pos_x_img_winner_text_dst = (getwidth() - img_1P_winner.getwidth()) / 2;
+
+		timer_winner_slide_in.restart();
+		timer_winner_slide_in.set_wait_time(2500);
+		timer_winner_slide_in.set_one_shot(true);
+		timer_winner_slide_in.set_callback([&]()
+			{
+				is_slide_out_started = true;
+			});
+
+		timer_winner_slide_out.restart();
+		timer_winner_slide_out.set_wait_time(1000);
+		timer_winner_slide_out.set_one_shot(true);
+		timer_winner_slide_out.set_callback([&]()
+			{
+				scene_manager.switch_to(SceneManager::SceneType::Menu);
+			});
+
+
 		//初始化玩家头像和位置
 		status_bar_1P.set_avatar(img_player_1_avatar);
 		status_bar_2P.set_avatar(img_player_2_avatar);
@@ -88,8 +120,9 @@ private:
 		small_platform_3.shape.right = (float)small_platform_3.render_position.x + small_platform_3.img->getwidth() - 40;
 		small_platform_3.shape.y = (float)small_platform_3.render_position.y + img_platform_small.getheight() / static_cast<float>(2);
 
-
+		mciSendString(_T("play bgmGame repeat from 0"), NULL, 0, NULL);
 	}
+
 	void on_update(int delta)
 	{
 		//调用玩家1和玩家2的更新方法
@@ -118,12 +151,58 @@ private:
 			bullet->on_update(delta);
 		}
 
+		const Vector2& position_player_1 = player_1->get_position();
+		const Vector2& position_player_2 = player_2->get_position();
+
+		if (position_player_1.y >= getheight())
+		{
+			player_1->set_hp(0);
+		}
+		if (position_player_2.y >= getheight())
+		{
+			player_2->set_hp(0);
+		}
+		if (player_1->get_hp() <= 0 || player_2->get_hp() <= 0)
+		{
+			if (!is_game_over)
+			{
+				mciSendString(_T("stop bgmGame"), NULL, 0, NULL);
+				mciSendString(_T("play uiWin from 0"), NULL, 0, NULL);
+			}
+
+			is_game_over = true;
+		}
+
+
 		status_bar_1P.set_hp(player_1->get_hp());
 		status_bar_1P.set_mp(player_1->get_mp());
 		status_bar_2P.set_hp(player_2->get_hp());
 		status_bar_2P.set_mp(player_2->get_mp());
 
+		if (is_game_over)
+		{
+			pos_img_winner_bar.x += (int)(speed_winner_bar * delta);
+			pos_img_winner_text.x += (int)(speed_winner_text * delta);
+
+			if (!is_slide_out_started)
+			{
+				timer_winner_slide_in.on_update(delta);
+				if (pos_img_winner_bar.x > pos_x_img_winner_bar_dst)
+				{
+					pos_img_winner_bar.x = pos_x_img_winner_bar_dst;
+				}
+				if (pos_img_winner_text.x > pos_x_img_winner_text_dst)
+				{
+					pos_img_winner_text.x = pos_x_img_winner_text_dst;
+				}
+			}
+			else
+			{
+				timer_winner_slide_out.on_update(delta);
+			}
+		}
 	}
+
 	void on_draw(const Camera& camera)
 	{
 		putimage_alpha(camera, pos_img_sky.x, pos_img_sky.y, &img_sky);
@@ -140,6 +219,7 @@ private:
 			settextcolor(RGB(255, 0, 0));
 			outtextxy(15, 15, _T("已开始调试模式，按 ' Q ' 键关闭"));
 		}
+
 		player_1->on_draw(camera);
 		player_2->on_draw(camera);
 
@@ -148,9 +228,19 @@ private:
 			bullet->on_draw(camera);
 		}
 
-		status_bar_1P.on_draw();
-		status_bar_2P.on_draw();
+		if (is_game_over)
+		{
+			putimage_alpha(pos_img_winner_bar.x, pos_img_winner_bar.y, &img_winner_bar);
+			putimage_alpha(pos_img_winner_text.x, pos_img_winner_text.y,
+				player_1->get_hp() > 0 ? &img_1P_winner : &img_2P_winner);
+		}
+		else
+		{
+			status_bar_1P.on_draw();
+			status_bar_2P.on_draw();
+		}
 	}
+
 	void on_input(const ExMessage& msg)
 	{
 		//将操作消息传递给玩家1和玩家2
@@ -173,14 +263,37 @@ private:
 
 	void on_exit()
 	{
+		delete player_1;
+		player_1 = nullptr;
+		delete player_2;
+		player_2 = nullptr;
 
+		is_debug = false;
+
+		bullet_list.clear();
+		main_camera.reset();
 	}
 
 private:
-	POINT pos_img_sky = { 0 };			// 天空图片位置
-	POINT pos_img_hills = { 0 };		// 山脉图片位置
+	const double speed_winner_bar = 1;
+	const double speed_winner_text = 1;
 
-	StatusBar status_bar_1P;			// 玩家1的状态栏
-	StatusBar status_bar_2P;			// 玩家2的状态栏
+	POINT pos_img_sky = { 0 };				// 天空图片位置
+	POINT pos_img_hills = { 0 };			// 山脉图片位置
 
+	StatusBar status_bar_1P;				// 玩家1的状态栏
+	StatusBar status_bar_2P;				// 玩家2的状态栏
+
+	bool is_game_over = false;				// 游戏是否结束
+
+	POINT pos_img_winner_bar = { 0 };		// 结算动效背景图片位置
+	POINT pos_img_winner_text = { 0 };		// 结算动效文本位置
+
+	int pos_x_img_winner_bar_dst = 0;		// 结算动效背景移动的目标位置
+	int pos_x_img_winner_text_dst = 0;		// 结算动效文本移动的目标位置
+
+	Timer timer_winner_slide_in;			// 结算动效滑入计时器
+	Timer timer_winner_slide_out;			// 结算动效滑出计时器
+
+	bool is_slide_out_started = false;		// 结算动效是否开始滑出
 };

@@ -10,6 +10,9 @@
 
 extern bool is_debug; // 是否为调试模式
 
+extern IMAGE img_1P_cursor; // 1P 指示光标图片
+extern IMAGE img_2P_cursor; // 2P 指示光标图片
+
 extern Atlas atlas_run_effect; // 奔跑特效图集
 extern Atlas atlas_jump_effect; // 跳跃特效图集
 extern Atlas atlas_land_effect; // 落地特效图集
@@ -20,9 +23,9 @@ extern std::vector<Bullet*> bullet_list;
 class Player
 {
 public:
-	Player()
+	Player(bool facing_right = true) : is_facing_right(facing_right)
 	{
-		current_animation = &animation_idle_right;
+		current_animation = is_facing_right ? &animation_idle_right : &animation_idle_left;
 
 		//初始化普通攻击冷却定时器
 		timer_attack_cd.set_wait_time(attack_cd);
@@ -92,6 +95,15 @@ public:
 			{
 				is_land_effect_visible = false;
 			});
+
+		//初始化指示器
+		timer_cursor_visibility.set_wait_time(2500);
+		timer_cursor_visibility.set_one_shot(true);
+		timer_cursor_visibility.set_callback([&]()
+			{
+				is_cursor_visible = false;
+			});
+
 	}
 	~Player() = default;
 
@@ -104,10 +116,10 @@ public:
 		{
 			if (!is_attacking_ex)
 			{
-				is_fating_right = direction > 0;
+				is_facing_right = direction > 0;
 			}
 			//根据玩家的移动方向来切换动画
-			current_animation = is_fating_right ? &animation_run_right : &animation_run_left;
+			current_animation = is_facing_right ? &animation_run_right : &animation_run_left;
 			//在这一帧中玩家在水平方向上移动的距离存储在distance中
 			float distance = direction * run_velocity * delta;
 			on_run(distance);
@@ -115,14 +127,19 @@ public:
 		else
 		{
 			//如果玩家没有移动，那么就播放默认动画
-			current_animation = is_fating_right ? &animation_idle_right : &animation_idle_left;
+			current_animation = is_facing_right ? &animation_idle_right : &animation_idle_left;
 			timer_run_effect_generation.pause();
 		}
 
 		if (is_attacking_ex)
 		{
-			current_animation = is_fating_right ? &animation_attack_ex_right : &animation_attack_ex_left;
+			current_animation = is_facing_right ? &animation_attack_ex_right : &animation_attack_ex_left;
 
+		}
+
+		if (hp <= 0)
+		{
+			current_animation = last_hurt_direcrion.x < 0 ? &animation_die_left : &animation_die_right;
 		}
 
 		//更新动画
@@ -142,6 +159,9 @@ public:
 		animation_jump_effect.on_update(delta);
 		//更新落地特效动画
 		animation_land_effect.on_update(delta);
+
+		//更新指示器
+		timer_cursor_visibility.on_update(delta);
 
 		if (hp <= 0)
 		{
@@ -175,7 +195,7 @@ public:
 		{
 			is_attacking_ex = false;
 			// 重置动画为默认动画
-			current_animation = is_fating_right ? &animation_idle_right : &animation_idle_left;
+			current_animation = is_facing_right ? &animation_idle_right : &animation_idle_left;
 		}
 	}
 
@@ -204,6 +224,21 @@ public:
 		{
 			//对当前正在播放的动画进行绘制
 			current_animation->on_draw(camera, (int)position.x, (int)position.y);
+		}
+
+		if (is_cursor_visible)
+		{
+			switch (id)
+			{
+			case PlayerID::P1:
+				putimage_alpha(camera, (int)position.x + (size.x - img_1P_cursor.getwidth()) / 2,
+					(int)(position.y - img_1P_cursor.getheight()), &img_1P_cursor);
+				break;
+			case PlayerID::P2:
+				putimage_alpha(camera, (int)position.x + (size.x - img_2P_cursor.getwidth()) / 2,
+					(int)(position.y - img_2P_cursor.getheight()), &img_2P_cursor);
+				break;
+			}
 		}
 
 		if (is_debug)
@@ -405,6 +440,11 @@ public:
 		timer_invulnerable.restart();
 	}
 
+	void set_hp(int val)
+	{
+		hp = val;
+	}
+
 	int get_hp() const
 	{
 		return hp;
@@ -427,6 +467,11 @@ protected:
 		velocity.y += gravity * delta;
 		//根据速度来更新玩家的位置
 		position += velocity * (float)delta;
+
+		if (hp <= 0)
+		{
+			return;
+		}
 
 		//玩家的速度向下时检测碰撞
 		if (velocity.y > 0)
@@ -500,6 +545,12 @@ protected:
 					bullet->on_collide();
 					bullet->set_valid(false);
 					hp -= bullet->get_damage();
+					last_hurt_direcrion = bullet->get_position() - position;
+					if (hp <= 0)
+					{
+						velocity.x = last_hurt_direcrion.x < 0 ? 0.35f : -0.35f;
+						velocity.y = -1.0f;
+					}
 				}
 
 			}
@@ -529,6 +580,9 @@ protected:
 	Animation animation_attack_ex_left;		//玩家朝向左的特殊攻击动画
 	Animation animation_attack_ex_right;	//玩家朝向右的特殊攻击动画
 
+	Animation animation_die_left;			//玩家朝向左的死亡动画
+	Animation animation_die_right;			//玩家朝向右的死亡动画
+
 	Animation animation_jump_effect;		//跳跃特效动画
 	Animation animation_land_effect;		//落地特效动画
 
@@ -545,7 +599,7 @@ protected:
 	bool is_left_key_down = false;			//左键是否按下
 	bool is_right_key_down = false;			//右键是否按下
 
-	bool is_fating_right = true;			//玩家是否朝向右边
+	bool is_facing_right = true;			//玩家是否朝向右边
 
 	int attack_cd = 500;					//普通攻击冷却时间
 	bool can_attack = true;					//玩家是否可以释放普通攻击
@@ -565,5 +619,10 @@ protected:
 	Timer timer_die_effect_generation;		//死亡特效粒子发射定时器
 
 	std::vector<Particle> particle_list;	//粒子对象数组
+
+	bool is_cursor_visible = true;			//指示光标是否可见
+	Timer timer_cursor_visibility;			//指示光标可见性定时器
+
+	Vector2 last_hurt_direcrion;			//最后一次受击的方向
 };
 
