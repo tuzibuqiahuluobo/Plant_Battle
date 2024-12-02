@@ -2,12 +2,17 @@
 
 #include "camera.h"
 #include "vector2.h"
+#include "particle.h"
 #include "player_id.h"
 #include "platform.h"
 #include "animation.h"	
 #include <graphics.h>
 
 extern bool is_debug; // 是否为调试模式
+
+extern Atlas atlas_run_effect; // 奔跑特效图集
+extern Atlas atlas_jump_effect; // 跳跃特效图集
+extern Atlas atlas_land_effect; // 落地特效图集
 
 extern std::vector<Platform> platform_list;
 extern std::vector<Bullet*> bullet_list;
@@ -41,6 +46,52 @@ public:
 			{
 				is_showing_sketch_frame = !is_showing_sketch_frame;
 			});
+
+		//初始化奔跑特效定时器
+		timer_run_effect_generation.set_wait_time(75);
+		timer_run_effect_generation.set_callback([&]()//[&] 表示捕获外部作用域中的所有变量。
+			{
+				Vector2 particle_position;//声明了一个 Vector2 类型的变量 particle_position，用于存储粒子的位置
+				IMAGE* frame = atlas_run_effect.get_image(0);//从 atlas_run_effect 中获取第一个图像帧，并将其指针存储在 frame 变量中
+				particle_position.x = position.x + (size.x - frame->getwidth()) / 2;
+				particle_position.y = position.y + size.y - frame->getheight();
+				//将粒子的位置设置在玩家位置的中心。position.x 是玩家的 x 轴位置，
+				// size.x 是玩家的宽度，frame->getwidth() 是图像帧的宽度
+				particle_list.emplace_back(particle_position, &atlas_run_effect, 45);
+				//这行代码在 particle_list 中添加一个新的粒子对象。
+				// 粒子的位置是 particle_position，
+				// 使用的图像集是 atlas_run_effect，
+				// 粒子的生命周期是 45 毫秒。
+			});
+
+		//初始化死亡特效定时器
+		timer_die_effect_generation.set_wait_time(35);
+		timer_die_effect_generation.set_callback([&]()
+			{
+				Vector2 particle_position;
+				IMAGE* frame = atlas_run_effect.get_image(0);
+				particle_position.x = position.x + (size.x - frame->getwidth()) / 2;
+				particle_position.y = position.y + size.y - frame->getheight();
+				particle_list.emplace_back(particle_position, &atlas_run_effect, 150);
+			});
+
+		//初始化跳跃特效定时器
+		animation_jump_effect.set_atlas(&atlas_jump_effect);
+		animation_jump_effect.set_interval(25);
+		animation_jump_effect.set_loop(false);
+		animation_jump_effect.set_callback([&]()
+			{
+				is_jump_effect_visible = false;
+			});
+
+		//初始化落地特效定时器
+		animation_land_effect.set_atlas(&atlas_land_effect);
+		animation_land_effect.set_interval(50);
+		animation_land_effect.set_loop(false);
+		animation_land_effect.set_callback([&]()
+			{
+				is_land_effect_visible = false;
+			});
 	}
 	~Player() = default;
 
@@ -65,6 +116,7 @@ public:
 		{
 			//如果玩家没有移动，那么就播放默认动画
 			current_animation = is_fating_right ? &animation_idle_right : &animation_idle_left;
+			timer_run_effect_generation.pause();
 		}
 
 		if (is_attacking_ex)
@@ -82,6 +134,34 @@ public:
 		timer_invulnerable.on_update(delta);
 		//更新无敌动画闪烁定时器
 		timer_invulnerable_blink.on_update(delta);
+
+		//更新奔跑特效动画
+		timer_run_effect_generation.on_update(delta);
+
+		//更新跳跃特效动画
+		animation_jump_effect.on_update(delta);
+		//更新落地特效动画
+		animation_land_effect.on_update(delta);
+
+		if (hp <= 0)
+		{
+			timer_die_effect_generation.on_update(delta);
+		}
+
+		particle_list.erase(std::remove_if(
+			particle_list.begin(),
+			particle_list.end(), 
+			[](const Particle& particle)
+			{
+				return !particle.check_valid();
+			}),
+			particle_list.end());
+
+		for (Particle& particle : particle_list)
+		{
+			particle.on_update(delta);
+		}
+
 
 		if (is_showing_sketch_frame)
 		{
@@ -101,6 +181,21 @@ public:
 
 	virtual void on_draw(const Camera& camera)
 	{
+		if (is_jump_effect_visible)
+		{
+			animation_jump_effect.on_draw(camera, (int)position_jump_effect.x, (int)position_jump_effect.y);
+		}
+
+		if (is_land_effect_visible)
+		{
+			animation_land_effect.on_draw(camera, (int)position_land_effect.x, (int)position_land_effect.y);
+		}
+
+		for (const Particle& particle : particle_list)
+		{
+			particle.on_draw(camera);
+		}
+
 		if (hp > 0 && is_invulnerable && is_showing_sketch_frame)
 		{
 			putimage_alpha(camera, (int)position.x, (int)position.y, &img_sketch);
@@ -252,6 +347,7 @@ public:
 		}
 
 		position.x += distance;
+		timer_run_effect_generation.resume();
 	}
 
 	virtual void on_jump()
@@ -263,6 +359,23 @@ public:
 		}
 		//设置玩家的垂直速度为跳跃速度
 		velocity.y += jump_velocity;
+		//播放跳跃特效动画
+		is_jump_effect_visible = true;
+		animation_jump_effect.reset();
+
+		IMAGE* effect_frame = animation_jump_effect.get_frame();
+		position_jump_effect.x = position.x + (size.x - effect_frame->getwidth()) / 2;
+		position_jump_effect.y = position.y + size.y - effect_frame->getheight();
+	}
+
+	virtual void on_land()
+	{
+		is_land_effect_visible = true;
+		animation_land_effect.reset();
+
+		IMAGE* effect_frame = animation_land_effect.get_frame();
+		position_land_effect.x = position.x + (size.x - effect_frame->getwidth()) / 2;
+		position_land_effect.y = position.y + size.y - effect_frame->getheight();
 	}
 	
 	//攻击逻辑
@@ -308,6 +421,8 @@ protected:
 	//物理相关的所有代码
 	void move_and_collide(int delta)
 	{
+		float last_velocity_y = velocity.y;
+
 		//根据重力加速度的值来更新玩家的速度
 		velocity.y += gravity * delta;
 		//根据速度来更新玩家的位置
@@ -358,6 +473,12 @@ protected:
 					{
 						position.y = shape.y - size.y;
 						velocity.y = 0;
+
+						//只有在前一帧y轴速度不等于0，并且当前帧y轴速度等于0时才触发落地事件
+						if (last_velocity_y != 0)
+						{
+							on_land();
+						}
 						break;
 					}
 				}
@@ -408,6 +529,14 @@ protected:
 	Animation animation_attack_ex_left;		//玩家朝向左的特殊攻击动画
 	Animation animation_attack_ex_right;	//玩家朝向右的特殊攻击动画
 
+	Animation animation_jump_effect;		//跳跃特效动画
+	Animation animation_land_effect;		//落地特效动画
+
+	bool is_jump_effect_visible = false;	//跳跃特效动画是否可见
+	bool is_land_effect_visible = false;	//落地特效动画是否可见
+
+	Vector2 position_jump_effect;			//跳跃特效动画的位置
+	Vector2 position_land_effect;			//落地特效动画的位置
 
 	Animation* current_animation = nullptr; //当前正在播放的动画
 
@@ -431,5 +560,10 @@ protected:
 	Timer timer_invulnerable_blink;			//无敌状态闪烁定时器
 
 	IMAGE img_sketch;						//剪影图像
+
+	Timer timer_run_effect_generation;		//奔跑特效粒子发射定时器
+	Timer timer_die_effect_generation;		//死亡特效粒子发射定时器
+
+	std::vector<Particle> particle_list;	//粒子对象数组
 };
 
