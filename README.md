@@ -33,21 +33,9 @@ Plant_Battle/
 
 ├── include/ # 头文件目录
 
-│ ├── scene/ # 场景头文件
-
-│ │ ├── scene.h # 场景基类声明
-
-│ │ ├── game_scene.h # 游戏场景声明
-
-│ │ ├── menu_scene.h # 主菜单场景声明
-
-│ │ ├── selector_scene.h # 选人场景声明
-
 │ ├── animation.h # 动画声明
 
 │ ├── atlas.h # 图集类声明
-
-│ ├── platform.h # 碰撞类声明
 
 │ ├── camera.h # 摄像机声明
 
@@ -55,7 +43,15 @@ Plant_Battle/
 
 │ ├── vector2.h # 坐标位置声明
 
+│ ├── scene.h # 场景基类声明
+
 │ ├── scene_manager.h # 场景管理器声明
+
+│ ├── game_scene.h # 游戏场景声明
+
+│ ├── menu_scene.h # 主菜单场景声明
+
+│ ├── selector_scene.h # 选人场景声明
 
 │ └── timer.h # 计时器声明
 
@@ -87,17 +83,11 @@ Plant_Battle/
 
 
 
-## 目前待完成功能
 
-- [ ] 玩家类设计和角色移动基础
-- [ ] 平台单向碰撞检测和重力模拟
-- [ ] 角色技能设计和子弹基类实现
-- [ ] 玩家子弹派生类详细实现
-- [ ] 玩家子弹发射和角色技能实现
-- [ ] 无敌帧和玩家状态栏实现
-- [ ] 粒子系统和角色特效动画实现
-- [ ] 胜负检定和结算动效实现
+贡献 🙌
+欢迎任何形式的贡献！如果你有好的想法或发现了问题，欢迎提交 Issue 或 Pull Request。
 
-👨‍💻 开发者: nuomimuyouci
 
-📫 联系信息: https://github.com/tuzibuqiahuluobo \ 2672172829@qq.com
+开发者 👨‍💻
+开发者: nuomimuyouci
+联系信息: https://github.com/tuzibuqiahuluobo

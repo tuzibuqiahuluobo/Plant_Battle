@@ -3,6 +3,7 @@
 #include "scene.h"
 #include "atlas.h"
 #include "platform.h"
+#include "player.h"
 #include "menu_scene.h"
 #include "game_scene.h"
 #include "selector_scene.h"
@@ -99,7 +100,6 @@ IMAGE img_avatar_peashooter; // 婉逗射手头像图片
 IMAGE img_avatar_sunflower; // 龙日葵头像图片
 
 
-
 Scene* menu_scene = nullptr;
 Scene* game_scene = nullptr;
 Scene* selector_scene = nullptr;
@@ -111,6 +111,11 @@ SceneManager scene_manager;
 
 //vector类型的平台列表
 std::vector<Platform> platform_list;
+
+//定义玩家指针
+Player* player_1 = nullptr;
+Player* player_2 = nullptr;
+
 
 void filp_atlas(Atlas& src, Atlas& dst)
 {
