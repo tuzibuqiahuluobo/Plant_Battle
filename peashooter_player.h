@@ -51,7 +51,10 @@ public:
 		设置timer_attack_ex定时器的回调函数，当定时器触发时，将is_attacking_ex标志设置为false，表示特殊攻击结束。*/
 		timer_attack_ex.set_wait_time(attack_ex_duration);
 		timer_attack_ex.set_one_shot(true);
-		timer_attack_ex.set_callback([&]() { is_attacking_ex = false; });
+		timer_attack_ex.set_callback([&]() 
+			{ 
+				is_attacking_ex = false;
+			});
 
 		/*
 		4.	timer_spwan_pea_ex.set_wait_time(100); 
@@ -60,7 +63,10 @@ public:
 		设置timer_spwan_pea_ex定时器的回调函数，当定时器触发时，
 			调用spawn_pea_bullet函数生成一个速度为speed_pea_ex的豌豆子弹。*/
 		timer_spwan_pea_ex.set_wait_time(100);
-		timer_spwan_pea_ex.set_callback([&]() { spawn_pea_bullet(speed_pea_ex); });
+		timer_spwan_pea_ex.set_callback([&]()
+			{ 
+				spawn_pea_bullet(speed_pea_ex);
+			});
 
 		attack_cd = 100; //普通攻击冷却时间100毫秒
 	}

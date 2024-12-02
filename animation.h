@@ -13,6 +13,7 @@ private:
 	int interval = 0;		//帧间隔
 	int idx_frame = 0;		//当前帧索引
 	bool is_loop = true;	//是否循环播放
+
 	Atlas* atlas = nullptr;
 	std::function<void()> callback;
 	//function是一个模板类,<>里面是这个函数对象存储的函数返回值为void,参数为空的函数指针
@@ -26,6 +27,7 @@ public:
 		//重置计时器、帧索引
 		timer = 0;
 		idx_frame = 0;
+
 	}
 
 	void set_atlas(Atlas* new_atlas)//用来设置动画的图集
@@ -97,6 +99,8 @@ public:
 		//设置回调函数
 		this->callback = callback;
 	}
+
+
 
 };
 

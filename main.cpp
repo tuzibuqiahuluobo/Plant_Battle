@@ -123,8 +123,6 @@ Player* player_2 = nullptr;
 IMAGE* img_player_1_avatar = nullptr;
 IMAGE* img_player_2_avatar = nullptr;
 
-//定义一个全局自定义判断变量
-bool is_explore = true;
 
 
 void filp_atlas(Atlas& src, Atlas& dst)

@@ -45,7 +45,7 @@ public:
 		animation_attack_ex_left.set_interval(100);
 		animation_attack_ex_right.set_interval(100);
 
-		animation_sun_text.set_interval(10);
+		animation_sun_text.set_interval(100);
 
 		animation_attack_ex_left.set_loop(false);
 		animation_attack_ex_right.set_loop(false);
@@ -59,6 +59,11 @@ public:
 			});
 		animation_idle_right.set_callback([&]()
 			{
+				is_attacking_ex = false;
+				is_sun_text_visible = false;
+			});
+
+		animation_sun_text.set_callback([&]() {
 				is_attacking_ex = false;
 				is_sun_text_visible = false;
 			});
@@ -123,7 +128,7 @@ public:
 
 		bullet->set_callback([&]()
 			{
-				mp += 35;
+				mp += 20;
 			});
 
 		bullet_list.push_back(bullet);
@@ -134,20 +139,13 @@ public:
 		is_attacking_ex = true;
 		is_sun_text_visible = true;
 		
+		/*animation_sun_text.pause();*/
+		/*animation_sun_text.restart();*/
 		animation_sun_text.reset();
-
-		is_sun_text_visible = is_explore;
-
-		if (is_sun_text_visible)
+		/*if (is_sun_text_visible)
 		{
-			std::cout << "true" << std::endl;
-		}
-		else
-		{
-			std::cout << "false" << std::endl;
-		}
-		
-
+			is_sun_text_visible = false;
+		}*/
 		is_fating_right ? animation_attack_ex_right.reset() : animation_attack_ex_left.reset();
 		
 
@@ -171,10 +169,8 @@ public:
 		//设置子弹的碰撞回调函数，当子弹碰撞时，增加玩家的mp值。
 		bullet->set_callback([&]()
 			{
-				mp += 50;
+				mp += 30;
 			});
-
-		
 
 		bullet_list.push_back(bullet);
 

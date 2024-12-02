@@ -274,13 +274,6 @@ public:
 	//ÌØÊâ¹¥»÷Âß¼­
 	virtual void on_attack_ex()
 	{
-		if (!is_attacking_ex)
-		{
-			is_attacking_ex = true;
-			// ÉèÖÃ´óÕÐ¶¯»­
-			current_animation = is_fating_right ? &animation_attack_ex_right : &animation_attack_ex_left;
-			current_animation->reset();
-		}
 	}
 
 	const Vector2& get_position() const

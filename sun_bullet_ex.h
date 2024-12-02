@@ -8,8 +8,9 @@
 extern Atlas atlas_sun_ex;			// 特殊日光动画图集
 extern Atlas atlas_sun_ex_explode;	// 特殊日光爆炸动画图集
 
+
 extern Camera main_camera;
-extern bool is_explore;
+
 
 class SunBulletEx : public Bullet
 {
@@ -22,6 +23,7 @@ public:
 
 		animation_ex_idle.set_atlas(&atlas_sun_ex);
 		animation_ex_idle.set_interval(50);
+
 
 		animation_ex_explode.set_atlas(&atlas_sun_ex_explode);
 		animation_ex_explode.set_interval(50);
@@ -63,7 +65,7 @@ public:
 			- min(this->position.x, position.x) <= this->size.x + size.x);
 		bool is_collide_y = (max(this->position.y + this->size.y,position.y + size.y)
 			- min(this->position.y, position.y) <= this->size.y + size.y);
-		
+		//返回水平和垂直方向上的碰撞检测结果
 		return is_collide_x && is_collide_y;
 	}
 
@@ -77,7 +79,6 @@ public:
 		if (!valid)
 		{
 			animation_ex_explode.on_update(delta);
-			
 		}
 		else
 		{
@@ -110,6 +111,7 @@ public:
 private:
 	Animation animation_ex_idle;		// 特殊太阳子弹默认动画
 	Animation animation_ex_explode;		// 特殊太阳子弹爆炸动画
+	
 	Vector2 explode_render_offset;		// 爆炸动画渲染偏移
 
 	
