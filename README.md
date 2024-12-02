@@ -35,25 +35,39 @@ Plant_Battle/
 
 ├── include/ # 头文件目录
 
-│ ├── animation.h # 动画声明
+│ ├── animation.h # 动画头文件
 
-│ ├── atlas.h # 图集类声明
+│ ├── atlas.h # 图集类头文件
 
-│ ├── camera.h # 摄像机声明
+│ ├── camera.h # 摄像机头文件
 
-│ ├── Utill.h # 工具声明
+│ ├── platform.h # 物理模拟头文件
 
-│ ├── vector2.h # 坐标位置声明
+│ ├── Utill.h # 工具头文件
 
-│ ├── scene.h # 场景基类声明
+│ ├── vector2.h # 坐标位置头文件
 
-│ ├── scene_manager.h # 场景管理器声明
+│ ├── scene_manager.h # 场景管理器头文件
 
-│ ├── game_scene.h # 游戏场景声明
+│ ├── scene/ #场景筛选器
 
-│ ├── menu_scene.h # 主菜单场景声明
+│ │ ├── scene.h # 场景基类头文件
 
-│ ├── selector_scene.h # 选人场景声明
+│ │ ├── game_scene.h # 游戏场景头文件
+
+│ │ ├── menu_scene.h # 主菜单场景头文件
+
+│ │ ├── selector_scene.h # 选人场景头文件
+
+│ ├── Player/ #角色筛选器
+
+│ │ ├── player.h # 角色基类头文件
+
+│ │ ├── player_id.h # 角色id基类头文件
+
+│ │ ├── peashooter_player.h # 豌豆射手基类头文件
+
+│ │ ├── sunflower_player.h # 龙日葵基类头文件
 
 │ └── timer.h # 计时器声明
 
