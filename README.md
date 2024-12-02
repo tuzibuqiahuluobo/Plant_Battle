@@ -49,7 +49,7 @@ Plant_Battle/
 
 │ ├── scene_manager.h # 场景管理器头文件
 
-│ ├── scene/ #场景筛选器
+│ ├── scene/ # 场景筛选器
 
 │ │ ├── scene.h # 场景基类头文件
 
@@ -59,7 +59,7 @@ Plant_Battle/
 
 │ │ ├── selector_scene.h # 选人场景头文件
 
-│ ├── player/ #角色筛选器
+│ ├── player/ # 角色筛选器
 
 │ │ ├── player.h # 角色基类头文件
 
@@ -68,6 +68,16 @@ Plant_Battle/
 │ │ ├── peashooter_player.h # 豌豆射手基类头文件
 
 │ │ ├── sunflower_player.h # 龙日葵基类头文件
+
+│ ├── bullet/ # 子弹筛选器
+
+│ │ ├── bullet.h # 子弹基类头文件
+
+│ │ ├── pea_bullet.h # 豌豆子弹头文件
+
+│ │ ├── sun_bullet.h # 阳光炸弹子弹头文件
+
+│ │ ├── sun_bullet_ex.h # 超级阳光炸弹子弹头文件
 
 │ └── timer.h # 计时器声明
 
@@ -111,7 +121,7 @@ Plant_Battle/
 - [x] 游戏局内场景搭建和物理模拟基础
 - [x] 玩家类设计和角色移动基础
 - [x] 平台单向碰撞检测和重力模拟
-- [ ] 角色技能设计和子弹基类实现
+- [x] 角色技能设计和子弹基类实现
 - [ ] 玩家子弹派生类实现
 - [ ] 玩家子弹发射和角色技能实现
 - [ ] 无敌帧和玩家状态栏实现
