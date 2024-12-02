@@ -15,6 +15,8 @@ extern Atlas atlas_peashooter_attack_ex_left; // Íñ¶ºÉäÊÖ³¯Ïò×óµÄÌØÊâ¹¥»÷¶¯»­Í¼¼
 extern Atlas atlas_peashooter_attack_ex_right; // Íñ¶ºÉäÊÖ³¯ÏòÓÒµÄÌØÊâ¹¥»÷¶¯»­Í¼¼¯
 
 
+
+
 class PeashooterPlayer : public Player
 {
 public:

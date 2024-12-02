@@ -60,7 +60,7 @@ public:
 
 		//设置结束抖动状态的定时器
 		timer_shake.set_wait_time(duration); //设置抖动持续时间
-		timer_shake.resart(); //重新开始计时
+		timer_shake.restart(); //重新开始计时
 	}
 
 private:

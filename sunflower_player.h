@@ -15,8 +15,10 @@ extern Atlas atlas_sunflower_attack_ex_left; // 龙日葵朝向左的特殊攻击动画图集
 extern Atlas atlas_sunflower_attack_ex_right; // 龙日葵朝向右的特殊攻击动画图集
 extern Atlas atlas_sun_text; // “日” 文本动画图集
 
-extern Player* player1;
-extern Player* player2;
+extern Player* player_1;
+extern Player* player_2;
+
+
 
 class SunflowerPlayer : public Player
 {
@@ -135,7 +137,7 @@ public:
 
 		Bullet* bullet = new SunBulletEx();
 		//根据id判断目标对象是哪一个玩家
-		Player* target_player = (id == PlayerID::P1 ? player2 : player1);
+		Player* target_player = (id == PlayerID::P1 ? player_2 : player_1);
 
 		Vector2 bullet_position, bullet_velocity;
 		const Vector2& bullet_size = bullet->get_size();

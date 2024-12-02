@@ -84,6 +84,28 @@ private:
 		//调用玩家1和玩家2的更新方法
 		player_1->on_update(delta);
 		player_2->on_update(delta);
+
+		main_camera.on_update(delta);
+
+		//调用 std::vector::erase 函数来删除 bullet_list 中的元素
+		bullet_list.erase(std::remove_if( //使用 std::remove_if 函数重新排列 bullet_list 中的元素，使得所有需要删除的元素都被移动到容器的末尾
+			bullet_list.begin(), 
+			bullet_list.end(), 
+			[](const Bullet* bullet) //Lambda 表达式，用于判断每个子弹是否需要删除。
+			{ 
+				bool deletable = bullet->check_can_remove(); //调用 Bullet 类的 check_can_remove 方法，检查子弹是否可以删除
+				if (deletable) 
+				{
+					delete bullet;
+				}
+				return deletable;
+			}),
+			bullet_list.end());
+
+		for (Bullet* bullet : bullet_list)
+		{
+			bullet->on_update(delta);
+		}
 	}
 	void on_draw(const Camera& camera)
 	{
@@ -103,6 +125,11 @@ private:
 		}
 		player_1->on_draw(camera);
 		player_2->on_draw(camera);
+
+		for (const Bullet* bullet : bullet_list)
+		{
+			bullet->on_draw(camera);
+		}
 	}
 	void on_input(const ExMessage& msg)
 	{

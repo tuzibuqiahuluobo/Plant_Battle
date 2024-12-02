@@ -7,6 +7,7 @@
 extern IMAGE img_pea; // Íã¶¹×Óµ¯Í¼Æ¬
 extern Atlas atlas_pea_break;; // Íã¶¹×Óµ¯±¬Õ¨¶¯»­Í¼¼¯
 
+
 class PeaBullet : public Bullet
 {
 public:

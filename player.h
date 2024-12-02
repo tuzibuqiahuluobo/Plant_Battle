@@ -8,6 +8,7 @@
 #include <graphics.h>
 
 extern std::vector<Platform> platform_list;
+extern std::vector<Bullet*> bullet_list;
 
 class Player
 {
@@ -74,12 +75,12 @@ public:
 				case 0x44:
 					is_right_key_down = true;
 					break;
-					// 'W'
-				case 0x57:
+					// 'K'
+				case 0x4B:
 					on_jump();
 					break;
-					// 'F'
-				case 0x46:
+					// 'J'
+				case 0x4A:
 					if (can_attack)
 					{
 						on_attack();
@@ -87,8 +88,8 @@ public:
 						timer_attack_cd.restart();
 					}
 					break;
-					// 'G'
-				case 0x47:
+					// 'L'
+				case 0x4C:
 					if (mp >= 100)
 					{
 						on_attack_ex();
@@ -108,12 +109,12 @@ public:
 				case VK_RIGHT:
 					is_right_key_down = true;
 					break;
-					// '¡ü'
-				case VK_UP:
+					// '2'
+				case VK_NUMPAD2:
 					on_jump();
 					break;
-					// '.'
-				case VK_OEM_PERIOD:
+					// '1'
+				case VK_NUMPAD1:
 					if (can_attack)
 					{
 						on_attack();
@@ -121,8 +122,8 @@ public:
 						timer_attack_cd.restart();
 					}
 					break;
-					// '/'
-				case VK_OEM_2:
+					// '3'
+				case VK_NUMPAD3:
 					if (mp >= 100)
 					{
 						on_attack_ex();
@@ -284,6 +285,22 @@ protected:
 					}
 				}
 			}
+		}
+
+		for (Bullet* bullet :bullet_list)
+		{
+			if (!bullet->get_valid() || bullet->get_collide_target() != id)
+			{
+				continue;
+			}
+
+			if (bullet->check_collision(position,size))
+			{
+				bullet->on_collide();
+				bullet->set_valid(false);
+				hp -= bullet->get_damage();
+			}
+
 		}
 	}
 
